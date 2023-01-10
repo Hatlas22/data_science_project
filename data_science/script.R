@@ -18,11 +18,11 @@ namecol = as.list(c(colnames(data)[1], colnames(data)[4:12]))
 stats = summary(data[namecol])
 
 for (i in namecol) {
-  barplot(data[[i]])
-  boxplot(data[[i]])
+  print(ggplot(data = data, aes(x = status_id, y = i)) + geom_bar(color = "blue"))
+  ggsave(paste0("graphs/", i, ".pdf"), width = 15, height = 10)
 }
 
 ggplot(data, aes(x = status_type,y = num_reactions)) +
   geom_bar(stat = "identity", position = "dodge")
 
-ggsave("num_reactions-statut_type.pdf", width = 15, height = 10)
+ggsave("graphs/num_reactions-statut_type.pdf", width = 15, height = 10)
