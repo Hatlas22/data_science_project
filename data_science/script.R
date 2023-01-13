@@ -13,16 +13,22 @@ data = data[1:12]
 
 #Question 3
 
-namecol = as.list(c(colnames(data)[1], colnames(data)[4:12]))
+namecol = c(colnames(data)[1], colnames(data)[4:12])
 
 stats = summary(data[namecol])
 
+length(data$status_id)
+
 for (i in namecol) {
-  print(ggplot(data = data, aes(x = status_id, y = i)) + geom_bar(color = "blue"))
+  x= seq(1,length(data$i))
+  y= data$i
+  
+  data2 <- data.frame(x,y)
+  print(ggplot(data2) + geom_point(aes(x=x,y=y)))
   ggsave(paste0("graphs/", i, ".pdf"), width = 15, height = 10)
 }
 
-ggplot(data, aes(x = status_type,y = num_reactions)) +
+ggplot(data, aes(x = status_type, y = num_reactions)) +
   geom_bar(stat = "identity", position = "dodge")
 
 ggsave("graphs/num_reactions-statut_type.pdf", width = 15, height = 10)
