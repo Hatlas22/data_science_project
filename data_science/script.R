@@ -16,12 +16,13 @@ data = data[1:12]
 namecol = c(colnames(data)[1], colnames(data)[4:12])
 
 stats = summary(data[namecol])
+stats
 
-length(data$status_id)
+length(data$num_reactions)
 
 for (i in namecol) {
-  x= seq(1,length(data$i))
-  y= data$i
+  x= seq(1,length(data$status_id))
+  y= data[[i]]
   
   data2 <- data.frame(x,y)
   print(ggplot(data2) + geom_point(aes(x=x,y=y)))
