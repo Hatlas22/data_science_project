@@ -14,7 +14,7 @@ summary(dataset[1, 4:12])
 #4
 #Si 2 variables sont parfaitement corrélées, pas approprié de les inclure toutes les 2
 #car contiennent alors les mêmes infoset ça ne contribue donc pas à l'augmentation de la variance expliquée, que la PCA cherche à maximiser.
-#Vaut mieux garder que l'info la plus pertinente
+#Vaut mieux garder que l'info la plus pertinente (A vérif)
 
 #5
 #Si elles sont complètement non corrélées, approprié de les inclure toutes les 2 car infos différentes et complémentaires
@@ -43,14 +43,17 @@ dataset_scaled <- scale(dataset[,c("num_comments", "num_shares", "num_likes", "n
 pca <- prcomp(dataset_scaled, scale = TRUE)
 
 # Analyze the output
+pca
+#garder ,um_comments et num_shares
 summary(pca)
+#proportion of variance à regarder pour pve
 
 #Faut analyser les 2 premières composantes et les interpréter.
 
 #8
 # Calculate the variance explained by each component
 pve <- pca$sdev^2 / sum(pca$sdev^2) * 100
-summary(pve)
+pve
 
 barplot(pve, xlab = "Component", ylab = "PVE", col = "blue")
 
@@ -59,11 +62,10 @@ cumulative_pve <- cumsum(pve)
 
 # Plot the cumulative PVE
 plot(1:length(cumulative_pve), cumulative_pve, type = "l", xlab = "Component", ylab = "Cumulative PVE", col = "red")
-
-#Combien de composantes à garder et pourquoi ?
+#Les 2 premières parce qu'elles expliquent mieux (83%) (Argumenter)
 
 #9
-biplot(pca, scores=TRUE, var.axes=TRUE, cex=0.5, col=c("blue","red"),xlabs=rownames(dataset))
+biplot(pca, scores=TRUE, var.axes=TRUE, cex=0.5, col=c("blue","red"),xlabs=rownames(dataset)) #possible d'inverser les vecteurs ???
 #Interpréter les résultats
 
 #10
@@ -73,12 +75,12 @@ biplot(pca, scores=TRUE, var.axes=TRUE, cex=0.5, col=c("blue","red"),xlabs=rowna
 
 #11
 corel <- cor(dataset[, c("num_shares", "num_comments", "num_likes", "num_loves", "num_wows", "num_hahas", "num_sads", "num_angrys")])
-summary(corel)
+corel
 #Semble être le plus corrélé avec num-loves mais à vérif au cas où
 
 #12.1
 linear <- lm(num_shares ~ num_loves, dataset)
-summary(linear)
+linear
 #Coefficient estimés ?
 
 #12.2
