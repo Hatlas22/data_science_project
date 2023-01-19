@@ -1,0 +1,99 @@
+dataset <- read.table("Live_20210128.csv", header = TRUE, sep=",", row.names =)
+
+#1
+dim(dataset)
+
+#2
+is.na(dataset)
+within(dataset, rm("Column1", "Column2", "Column3", "Column4"))
+dataset = dataset[1:12]
+
+#3
+summary(dataset[1, 4:12])
+
+#4
+#Si 2 variables sont parfaitement corrélées, pas approprié de les inclure toutes les 2
+#car contiennent alors les mêmes infoset ça ne contribue donc pas à l'augmentation de la variance expliquée, que la PCA cherche à maximiser.
+#Vaut mieux garder que l'info la plus pertinente (A vérif)
+
+#5
+#Si elles sont complètement non corrélées, approprié de les inclure toutes les 2 car infos différentes et complémentaires
+#Cela peut permettre d'obtenir une meilleure compréhension de la structure des données.
+
+#6
+num_comments = dataset[5]
+num_shares = dataset[6]
+num_likes = dataset[7]
+num_loves = dataset[8]
+
+var(num_comments)
+var(num_shares)
+var(num_likes)
+var(num_loves)
+
+#Variables ont des échelles diff, donc des variances diff
+#Standardisation consiste à réduire les variables à une moyenne de 0 et une variance de 1
+#permet de mettre toutes les variables sur la même échelle et de les comparer aux autres
+
+#7
+# Standardize the variables
+dataset_scaled <- scale(dataset[,c("num_comments", "num_shares", "num_likes", "num_loves")])
+
+# Perform PCA
+pca <- prcomp(dataset_scaled, scale = TRUE)
+
+# Analyze the output
+pca
+#garder ,um_comments et num_shares
+summary(pca)
+#proportion of variance à regarder pour pve
+
+#Faut analyser les 2 premières composantes et les interpréter.
+
+#8
+# Calculate the variance explained by each component
+pve <- pca$sdev^2 / sum(pca$sdev^2) * 100
+pve
+
+barplot(pve, xlab = "Component", ylab = "PVE", col = "blue")
+
+# Calculate the cumulative PVE
+cumulative_pve <- cumsum(pve)
+
+# Plot the cumulative PVE
+plot(1:length(cumulative_pve), cumulative_pve, type = "l", xlab = "Component", ylab = "Cumulative PVE", col = "red")
+#Les 2 premières parce qu'elles expliquent mieux (83%) (Argumenter)
+
+#9
+biplot(pca, scores=TRUE, var.axes=TRUE, cex=0.5, col=c("blue","red"),xlabs=rownames(dataset)) #possible d'inverser les vecteurs ???
+#Interpréter les résultats
+
+#10
+#R² est un indicateur de la qualité de la régression linéaire. Il mesure la proportion de variance de la variable dépendante (Y) qui est expliquée par les variables indépendantes (X1 et X2). Plus R² est proche de 1, plus la régression linéaire est bonne.
+#La plage de valeurs que peut prendre R² est comprise entre 0 et 1.
+#La relation entre R² et les coefficients de corrélation r1 et r2 est que R² est égal à la somme des carrés des coefficients de corrélation r1 et r2.
+
+#11
+corel <- cor(dataset[, c("num_shares", "num_comments", "num_likes", "num_loves", "num_wows", "num_hahas", "num_sads", "num_angrys")])
+corel
+#Semble être le plus corrélé avec num-loves mais à vérif au cas où
+
+#12.1
+linear <- lm(num_shares ~ num_loves, dataset)
+linear
+#Coefficient estimés ?
+
+#12.2
+#L'expression générale d'un intervalle de confiance 1-α pour le paramètre β1 est donnée par : β1 ± t(α/2,n-2) * s(epsilon) / sqrt(Somme des carrés de X)
+#où t(α/2,n-2) est la valeur critique de la loi de Student pour un niveau de confiance 1-α et s(epsilon) est l'écart-type des erreurs
+confint(linear, level = 0.95)
+# Faut Interpréter les résultats
+
+#12.3
+t.test(linear$residuals ~ dataset$num_loves)
+#j'arrive pas à le faire fonctionner
+
+#12.4
+
+#13
+
